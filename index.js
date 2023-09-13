@@ -5,7 +5,7 @@ const { Client, Events, GatewayIntentBits, EmbedBuilder, ActivityType } = requir
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.once(Events.ClientReady, c => {
   console.log(`Prêt ! Connecté avec ${c.user.tag}`);
-  client.user.setActivity('Votre emploi du temps', { type: ActivityType.Watching });
+  client.user.setActivity('votre emploi du temps', { type: ActivityType.Watching });
   client.user.setStatus('online');
   CONNEXION();
 });
@@ -58,8 +58,8 @@ async function EDT(token, id) {
     });
     COURS = COURS.sort((a, b) => a.start_date - b.start_date);
 
-
-    if (COURS.length == 0) {
+    if (COURS.length === 0) {
+      var channel = client.channels.cache.get(CHANNEL_ID);
       const COURS_EMBED = new EmbedBuilder()
         .setTitle("Bonne nouvelle !")
         .setAuthor({ name: 'Emploi du temps', iconURL: 'https://cdn.discordapp.com/avatars/1107328790931181689/8936542da2ec67f0c034c6d0b6935309.png' })
@@ -70,7 +70,10 @@ async function EDT(token, id) {
         .setTimestamp()
         .setFooter({ text: 'Made by Barab', iconURL: 'https://cdn.discordapp.com/avatars/768517258262741024/dd87fc7b956cfb5b2d024c340e570fb5.png' });
 
-      channel.send({ embeds: [COURS_EMBED] });
+      channel.send({ embeds: [COURS_EMBED] }).then(() => {
+        console.log("Send terminé");
+        process.exit(0);
+      });
     }
 
     else {
@@ -98,11 +101,12 @@ async function EDT(token, id) {
         channel.send({ embeds: [COURS_EMBED] });
         console.log("Send n° " + SENT);
         SENT++;
+        if (SENT == LENGHT) {
+          console.log("Send terminé");
+          process.exit(0);
+        }
       }
     }
-  }).then(() => {
-    console.log("Send terminé");
-    process.exit(0);
-  });
+  })
 }
-client.login(token);
+client.login(token)
